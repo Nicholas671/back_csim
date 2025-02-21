@@ -1,28 +1,22 @@
-import axios from 'axios';
+async function searchAlbums(query) {
+    const response = await fetch('/api/spotify/token');
+    const data = await response.json();
+    const accessToken = data.access_token;
 
-const getAccessToken = async () => {
-    const response = await axios.post('https://accounts.spotify.com/api/token', null, {
-        params: {
-            grant_type: 'client_credentials',
-        },
+    const searchResponse = await fetch(`https://api.spotify.com/v1/search?q=${query}&type=album`, {
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${btoa(`${process.env.REACT_SPOTIFY_CLIENT_ID}:${process.env.REACT_SPOTIFY_CLIENT_SECRET}`)}`,
-        },
+            'Authorization': 'Bearer ' + accessToken
+        }
     });
-    return response.data.access_token;
-};
+    const searchData = await searchResponse.json();
+    return searchData.albums.items;
+}
 
-export const searchAlbums = async (query) => {
-    const accessToken = await getAccessToken();
-    const response = await axios.get('https://api.spotify.com/v1/search', {
-        params: {
-            q: query,
-            type: 'album',
-        },
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-        },
-    });
-    return response.data.albums.items;
-};
+async function getRandomAlbums() {
+    const response = await fetch('/api/spotify/random-albums');
+    const albums = await response.json();
+    return albums;
+}
+
+export { searchAlbums, getRandomAlbums };
+

@@ -1,38 +1,26 @@
 import React, { useState } from 'react';
-import { searchAlbums } from '../services/spotify.js';
+import { searchAlbums } from './spotify';
 
-const Search = () => {
+function Search() {
     const [query, setQuery] = useState('');
     const [albums, setAlbums] = useState([]);
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        const results = await searchAlbums(query);
-        setAlbums(results);
+    const handleSearch = async () => {
+        const albums = await searchAlbums(query);
+        setAlbums(albums);
     };
 
     return (
         <div>
-            <form onSubmit={handleSearch}>
-                <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search for an album..."
-                />
-                <button type="submit">Search</button>
-            </form>
-            <div>
-                {albums.map((album) => (
-                    <div key={album.id}>
-                        <h3>{album.name}</h3>
-                        <p>{album.artists[0].name}</p>
-                        <img src={album.images[0].url} alt={album.name} width="100" />
-                    </div>
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
+            <button onClick={handleSearch}>Search</button>
+            <ul>
+                {albums.map(album => (
+                    <li key={album.id}>{album.name}</li>
                 ))}
-            </div>
+            </ul>
         </div>
     );
-};
+}
 
 export default Search;
